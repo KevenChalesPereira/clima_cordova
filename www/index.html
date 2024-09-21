@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clima</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="cordova.js"></script>
+</head>
+<body>
+    <body class="container mt-5">
+        <div class="app text-center">
+
+            <div class="mt-4">
+                <h2>Escolha as Informações Climáticas</h2>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="tempCheckbox" >
+                    <label class="form-check-label" for="tempCheckbox">Temperatura</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="umidadeCheckbox" >
+                    <label class="form-check-label" for="umidadeCheckbox">Umidade</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="chuvaCheckbox">
+                    <label class="form-check-label" for="chuvaCheckbox">Chuva</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="ventoVelCheckbox">
+                    <label class="form-check-label" for="ventoVelCheckbox">Velocidade do Vento</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="ventoDirCheckbox">
+                    <label class="form-check-label" for="ventoDirCheckbox">Direção do Vento</label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="getLocation()">Clima</button>
+            
+            <div class="card mt-4" id="card" style="display: none">
+                <div class="card-body">
+                    <h2 class="card-title">Clima Atual</h2>
+                    <p class="card-text" id="temp" style="display: none;"></p>
+                    <p class="card-text" id="umidade" style="display: none;"></p>
+                    <p class="card-text" id="chuva" style="display: none;"></p>
+                    <p class="card-text" id="ventoVel" style="display: none;"></p>
+                    <p class="card-text" id="ventoDir" style="display: none;"></p>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition(clima); 
+        }
+
+        async function clima(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,rain,wind_speed_10m,wind_direction_10m`;
+
+            try {
+                const resposta = await fetch(url);
+                const data = await resposta.json();
+            
+
+                if (document.getElementById('tempCheckbox').checked) {
+                    const temperature = data.current.temperature_2m;
+                    document.getElementById('temp').innerText = `Temperatura: ${temperature} °C`;
+                    document.getElementById('temp').style.display = 'block';
+                }
+
+                if (document.getElementById('umidadeCheckbox').checked) {
+                    const umidade = data.current.relative_humidity_2m;
+                    document.getElementById('umidade').innerText = `Umidade: ${umidade} %`;
+                    document.getElementById('umidade').style.display = 'block';
+                }
+
+                
+                if (document.getElementById('chuvaCheckbox').checked) {
+                    const chuva = data.current.rain; 
+                    document.getElementById('chuva').innerText = `Chuva: ${chuva} mm`;
+                    document.getElementById('chuva').style.display = 'block';
+                }
+
+                if (document.getElementById('ventoVelCheckbox').checked) {
+                    const ventoVel = data.current.wind_speed_10m; 
+                    document.getElementById('ventoVel').innerText = `Velocidade do Vento: ${ventoVel} km/h`;
+                    document.getElementById('ventoVel').style.display = 'block';
+                }
+
+                if (document.getElementById('ventoDirCheckbox').checked) {
+                    const ventoDir = data.current.wind_direction_10m; 
+                    document.getElementById('ventoDir').innerText = `Direção do Vento: ${ventoDir}`;
+                    document.getElementById('ventoDir').style.display = 'block';
+                }
+
+                document.getElementById('card').style.display = 'block';
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    
+
+    </script>
+</body>
+</html>
